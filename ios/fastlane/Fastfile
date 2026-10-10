@@ -30,6 +30,11 @@ platform :ios do
       development: false
     )
 
+    create_app_identifier(
+      app_identifier: "com.lezzet.chefmerge.chefMerge",
+      app_name: "Chef Merge"
+    )
+
     get_provisioning_profile(
       app_identifier: "com.lezzet.chefmerge.chefMerge",
       development: false
