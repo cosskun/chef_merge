@@ -13,10 +13,14 @@ Future<void> main() async {
     return const SizedBox.shrink();
   };
 
-  await SaveService.init();
-  LocalizationService.init();
-  SoundService.init();
-  GameController.instance.loadSavedData();
+  try {
+    await SaveService.init();
+    LocalizationService.init();
+    SoundService.init();
+    GameController.instance.loadSavedData();
+  } catch (e) {
+    debugPrint('Init error: $e');
+  }
   runApp(const ChefMergeApp());
 }
 
