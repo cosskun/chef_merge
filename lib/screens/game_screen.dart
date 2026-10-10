@@ -140,30 +140,116 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       _controller.togglePause();
     }
 
+    final isEndless = _controller.isEndlessMode;
+    final level = _controller.currentLevel;
+
     final result = await showDialog<String>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
         backgroundColor: const Color(0xFFFFFDF8),
-        title: Row(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: Colors.orange.shade100,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Text('⏸️', style: TextStyle(fontSize: 20)),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade100,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Text('⏸️', style: TextStyle(fontSize: 20)),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  'Oyun Duraklatıldı',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.brown.shade900,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 10),
-            Text(
-              'Oyun Duraklatıldı',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w900,
-                color: Colors.brown.shade900,
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: isEndless ? Colors.purple.shade50 : Colors.amber.shade50,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: isEndless ? Colors.purple.shade200 : Colors.amber.shade300,
+                  width: 1.2,
+                ),
               ),
+              child: isEndless
+                  ? Row(
+                      children: [
+                        const Text('♾️', style: TextStyle(fontSize: 24)),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Sonsuz Şef Modu',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w900,
+                                  color: Color(0xFF4A148C),
+                                ),
+                              ),
+                              Text(
+                                'Mevcut Puan: ${_controller.score}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.purple.shade800,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        Text(level.icon, style: const TextStyle(fontSize: 24)),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Bölüm ${level.number}: ${level.title}',
+                                style: const TextStyle(
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.w900,
+                                  color: Color(0xFF3E2723),
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '${level.categoryName} • Hedef: ${level.targetScore} Puan',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.brown.shade700,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
             ),
           ],
         ),
