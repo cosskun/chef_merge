@@ -126,6 +126,122 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     });
   }
 
+  Future<void> _confirmResetData() async {
+    SoundService.playClick();
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogCtx) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(22),
+            side: BorderSide(color: Colors.red.shade200, width: 1.5),
+          ),
+          backgroundColor: const Color(0xFFFFFDF8),
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(7),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  shape: BoxShape.circle,
+                ),
+                child: const Text('⚠️', style: TextStyle(fontSize: 20)),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  LocalizationService.tr('reset_confirm_title'),
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red.shade900,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            LocalizationService.tr('reset_confirm_message'),
+            style: TextStyle(
+              fontSize: 13,
+              height: 1.45,
+              color: Colors.brown.shade800,
+            ),
+          ),
+          actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          actions: [
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                side: BorderSide(color: Colors.grey.shade400),
+                foregroundColor: Colors.brown.shade700,
+              ),
+              onPressed: () {
+                SoundService.playClick();
+                Navigator.of(dialogCtx).pop(false);
+              },
+              child: Text(
+                LocalizationService.tr('cancel'),
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red.shade700,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 2,
+              ),
+              onPressed: () {
+                Navigator.of(dialogCtx).pop(true);
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.delete_forever_rounded, size: 16),
+                  const SizedBox(width: 4),
+                  Text(
+                    LocalizationService.tr('confirm_reset'),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true && mounted) {
+      SoundService.playTrash();
+      await _controller.resetAllData();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Text('✨', style: TextStyle(fontSize: 16)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    LocalizationService.tr('reset_success'),
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.brown.shade800,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        setState(() {});
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -598,11 +714,26 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             ),
                             const SizedBox(height: 6),
 
-                            // Row 3 of Secondary Buttons: Nasıl Oynanır? (Rehber)
-                            _buildSecondaryButton(
-                              icon: '🎓',
-                              title: LocalizationService.tr('how_to_play'),
-                              onTap: _openTutorial,
+                            // Row 3 of Secondary Buttons: Nasıl Oynanır? (Rehber) & Verileri Sıfırla
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildSecondaryButton(
+                                    icon: '🎓',
+                                    title: LocalizationService.tr('how_to_play'),
+                                    onTap: _openTutorial,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: _buildSecondaryButton(
+                                    icon: '🔄',
+                                    title: LocalizationService.tr('reset_data'),
+                                    onTap: _confirmResetData,
+                                    highlightColor: Colors.red.shade50,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),

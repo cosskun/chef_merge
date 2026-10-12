@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'item_model.dart';
+import 'recipe_model.dart';
 
 class GameLevel {
   final int number;
@@ -52,6 +53,19 @@ class GameLevel {
   }
 
   bool isPassed(int score) => score >= star1Score;
+  /// O bölümün siparişleri için gerçekten gerekli olan hammadde havuzu.
+  /// Bölüm tariflerinde asla yer almayan yabancı/gereksiz malzemeleri otomatik olarak filtreler.
+  List<GameItem> get validRawPool {
+    final neededRawCodes = <String>{};
+    for (final order in orderPool) {
+      final reqs = Recipe.getRawIngredientsRequirements(order.code);
+      neededRawCodes.addAll(reqs.keys);
+    }
+    final filtered = rawPool.where((item) => neededRawCodes.contains(item.code)).toList();
+    if (filtered.isNotEmpty) return filtered;
+    final derived = GameItem.rawPool.where((item) => neededRawCodes.contains(item.code)).toList();
+    return derived.isNotEmpty ? derived : rawPool;
+  }
 
   static const List<GameLevel> allLevels = [
     // =========================================================================
@@ -146,7 +160,7 @@ class GameLevel {
       star1Score: 1300,
       star2Score: 2100,
       star3Score: 2850,
-      rawPool: [GameItem.rawBread, GameItem.rawTomato, GameItem.onion, GameItem.mushroom, GameItem.carrot],
+      rawPool: [GameItem.rawBread],
       orderPool: [GameItem.bakedBread],
       initialBoardItems: [GameItem.rawBread, GameItem.rawBread, GameItem.rawBread, GameItem.rawBread],
       themeColor: Color(0xFFFFA726),
@@ -191,7 +205,7 @@ class GameLevel {
       star1Score: 1500,
       star2Score: 2450,
       star3Score: 3300,
-      rawPool: [GameItem.rawBread, GameItem.avocado, GameItem.egg, GameItem.cheese, GameItem.butter],
+      rawPool: [GameItem.rawBread, GameItem.avocado, GameItem.egg, GameItem.cheese],
       orderPool: [GameItem.toast, GameItem.avocadoToast, GameItem.friedEgg],
       initialBoardItems: [GameItem.rawBread, GameItem.avocado, GameItem.egg, GameItem.cheese],
       themeColor: Color(0xFF558B2F),
@@ -225,9 +239,9 @@ class GameLevel {
       star1Score: 1650,
       star2Score: 2700,
       star3Score: 3650,
-      rawPool: [GameItem.egg, GameItem.butter],
+      rawPool: [GameItem.egg],
       orderPool: [GameItem.friedEgg],
-      initialBoardItems: [GameItem.egg, GameItem.butter, GameItem.egg, GameItem.butter],
+      initialBoardItems: [GameItem.egg, GameItem.egg, GameItem.egg, GameItem.egg],
       themeColor: Color(0xFFFFB300),
     ),
     GameLevel(
@@ -240,9 +254,9 @@ class GameLevel {
       star1Score: 1700,
       star2Score: 2800,
       star3Score: 3750,
-      rawPool: [GameItem.egg, GameItem.butter, GameItem.sucuk, GameItem.rawBread],
+      rawPool: [GameItem.egg, GameItem.sucuk, GameItem.rawBread],
       orderPool: [GameItem.friedEgg, GameItem.sucukFriedEgg, GameItem.bakedBread],
-      initialBoardItems: [GameItem.egg, GameItem.butter, GameItem.sucuk, GameItem.rawBread],
+      initialBoardItems: [GameItem.egg, GameItem.sucuk, GameItem.rawBread, GameItem.egg],
       themeColor: Color(0xFFC62828),
     ),
     GameLevel(
@@ -255,9 +269,9 @@ class GameLevel {
       star1Score: 1750,
       star2Score: 2850,
       star3Score: 3850,
-      rawPool: [GameItem.rawBread, GameItem.butter, GameItem.honey, GameItem.egg, GameItem.milk],
+      rawPool: [GameItem.rawBread, GameItem.honey, GameItem.egg, GameItem.milk],
       orderPool: [GameItem.pancake, GameItem.friedEgg, GameItem.bakedBread],
-      initialBoardItems: [GameItem.rawBread, GameItem.butter, GameItem.honey, GameItem.egg],
+      initialBoardItems: [GameItem.rawBread, GameItem.milk, GameItem.honey, GameItem.egg],
       themeColor: Color(0xFFFFA000),
     ),
     GameLevel(
@@ -270,9 +284,9 @@ class GameLevel {
       star1Score: 1850,
       star2Score: 3050,
       star3Score: 4100,
-      rawPool: [GameItem.rawBread, GameItem.butter, GameItem.honey, GameItem.strawberry, GameItem.egg, GameItem.sucuk, GameItem.milk],
+      rawPool: [GameItem.egg, GameItem.milk, GameItem.honey, GameItem.strawberry, GameItem.sucuk],
       orderPool: [GameItem.pancake, GameItem.strawberryPancake, GameItem.sucukFriedEgg],
-      initialBoardItems: [GameItem.rawBread, GameItem.butter, GameItem.honey, GameItem.strawberry],
+      initialBoardItems: [GameItem.egg, GameItem.milk, GameItem.honey, GameItem.strawberry],
       themeColor: Color(0xFFE91E63),
     ),
     GameLevel(
@@ -285,9 +299,9 @@ class GameLevel {
       star1Score: 1900,
       star2Score: 3150,
       star3Score: 4200,
-      rawPool: [GameItem.egg, GameItem.butter, GameItem.sucuk, GameItem.rawBread, GameItem.honey, GameItem.strawberry, GameItem.cheese, GameItem.milk],
+      rawPool: [GameItem.egg, GameItem.sucuk, GameItem.honey, GameItem.strawberry, GameItem.cheese, GameItem.milk],
       orderPool: [GameItem.sucukFriedEgg, GameItem.pancake, GameItem.strawberryPancake, GameItem.englishBreakfast],
-      initialBoardItems: [GameItem.egg, GameItem.butter, GameItem.sucuk, GameItem.rawBread],
+      initialBoardItems: [GameItem.egg, GameItem.sucuk, GameItem.honey, GameItem.milk],
       themeColor: Color(0xFFE65100),
     ),
 
@@ -304,7 +318,7 @@ class GameLevel {
       star1Score: 1950,
       star2Score: 3200,
       star3Score: 4300,
-      rawPool: [GameItem.rawBread, GameItem.sesame, GameItem.egg, GameItem.sucuk, GameItem.milk, GameItem.strawberry, GameItem.cheese],
+      rawPool: [GameItem.rawBread, GameItem.sesame],
       orderPool: [GameItem.simit],
       initialBoardItems: [GameItem.rawBread, GameItem.sesame, GameItem.rawBread, GameItem.sesame],
       themeColor: Color(0xFFE65100),
@@ -334,7 +348,7 @@ class GameLevel {
       star1Score: 2100,
       star2Score: 3450,
       star3Score: 4650,
-      rawPool: [GameItem.rawBread, GameItem.rawMeat, GameItem.sesame, GameItem.cheese],
+      rawPool: [GameItem.rawBread, GameItem.rawMeat, GameItem.sesame],
       orderPool: [GameItem.simit, GameItem.lahmacun],
       initialBoardItems: [GameItem.rawBread, GameItem.rawMeat, GameItem.sesame, GameItem.rawBread],
       themeColor: Color(0xFFD84315),
@@ -349,9 +363,9 @@ class GameLevel {
       star1Score: 2150,
       star2Score: 3550,
       star3Score: 4750,
-      rawPool: [GameItem.rawBread, GameItem.rawMeat, GameItem.cheese, GameItem.butter],
+      rawPool: [GameItem.rawBread, GameItem.rawMeat, GameItem.cheese],
       orderPool: [GameItem.lahmacun, GameItem.pide],
-      initialBoardItems: [GameItem.rawBread, GameItem.rawMeat, GameItem.cheese, GameItem.butter],
+      initialBoardItems: [GameItem.rawBread, GameItem.rawMeat, GameItem.cheese, GameItem.rawBread],
       themeColor: Color(0xFFBF360C),
     ),
     GameLevel(
@@ -364,9 +378,9 @@ class GameLevel {
       star1Score: 2200,
       star2Score: 3600,
       star3Score: 4850,
-      rawPool: [GameItem.rawBread, GameItem.sesame, GameItem.rawMeat, GameItem.cheese, GameItem.croissantDough, GameItem.nuts],
+      rawPool: [GameItem.rawBread, GameItem.sesame, GameItem.rawMeat, GameItem.cheese, GameItem.nuts],
       orderPool: [GameItem.cheeseSimit, GameItem.lahmacun, GameItem.pide, GameItem.baklava],
-      initialBoardItems: [GameItem.rawBread, GameItem.sesame, GameItem.rawMeat, GameItem.croissantDough],
+      initialBoardItems: [GameItem.rawBread, GameItem.sesame, GameItem.rawMeat, GameItem.nuts],
       themeColor: Color(0xFF689F38),
     ),
 
@@ -462,7 +476,7 @@ class GameLevel {
       star1Score: 2600,
       star2Score: 4300,
       star3Score: 5750,
-      rawPool: [GameItem.pastaDough, GameItem.rawBread, GameItem.rawTomato, GameItem.cheese, GameItem.sucuk, GameItem.mushroom, GameItem.olive],
+      rawPool: [GameItem.pastaDough],
       orderPool: [GameItem.spaghetti],
       initialBoardItems: [GameItem.pastaDough, GameItem.pastaDough, GameItem.pastaDough, GameItem.pastaDough],
       themeColor: Color(0xFFFFCA28),
@@ -499,17 +513,17 @@ class GameLevel {
     ),
     GameLevel(
       number: 29,
-      title: 'Kremalı Fettuccine Alfredo',
-      categoryName: '6. Aşama: Alfredo Mantar',
+      title: 'Kremalı Tavuklu Alfredo',
+      categoryName: '6. Aşama: Tavuklu Alfredo',
       icon: '🍝',
-      description: 'Mantar ve tereyağlı krema sosu ile ipeksi Fettuccine Alfredo pişir!',
+      description: 'Taze tavuk göğsü ve krema sosu ile ipeksi Tavuklu Alfredo pişir!',
       targetScore: 6200,
       star1Score: 2800,
       star2Score: 4650,
       star3Score: 6200,
-      rawPool: [GameItem.pastaDough, GameItem.mushroom, GameItem.rawTomato, GameItem.rawMeat, GameItem.milk],
+      rawPool: [GameItem.pastaDough, GameItem.rawChicken, GameItem.rawTomato, GameItem.rawMeat],
       orderPool: [GameItem.napoliPasta, GameItem.bolognesePasta, GameItem.alfredoPasta],
-      initialBoardItems: [GameItem.pastaDough, GameItem.mushroom, GameItem.rawMeat, GameItem.pastaDough],
+      initialBoardItems: [GameItem.pastaDough, GameItem.rawChicken, GameItem.rawMeat, GameItem.pastaDough],
       themeColor: Color(0xFFFFB300),
     ),
     GameLevel(
@@ -522,7 +536,7 @@ class GameLevel {
       star1Score: 2900,
       star2Score: 4800,
       star3Score: 6400,
-      rawPool: [GameItem.pastaDough, GameItem.rawTomato, GameItem.rawMeat, GameItem.cheese, GameItem.mushroom, GameItem.milk],
+      rawPool: [GameItem.pastaDough, GameItem.rawTomato, GameItem.rawMeat, GameItem.cheese, GameItem.rawChicken],
       orderPool: [GameItem.bolognesePasta, GameItem.alfredoPasta, GameItem.lasagna],
       initialBoardItems: [GameItem.pastaDough, GameItem.rawTomato, GameItem.rawMeat, GameItem.cheese],
       themeColor: Color(0xFF880E4F),
@@ -1124,9 +1138,9 @@ class GameLevel {
       star1Score: 5350,
       star2Score: 8850,
       star3Score: 11850,
-      rawPool: [GameItem.croissantDough, GameItem.nuts, GameItem.butter, GameItem.cheese, GameItem.milk, GameItem.rawRice, GameItem.rawBread],
+      rawPool: [GameItem.rawBread, GameItem.nuts, GameItem.butter, GameItem.cheese],
       orderPool: [GameItem.kunefe, GameItem.baklava],
-      initialBoardItems: [GameItem.croissantDough, GameItem.nuts, GameItem.butter, GameItem.cheese],
+      initialBoardItems: [GameItem.rawBread, GameItem.nuts, GameItem.butter, GameItem.cheese],
       themeColor: Color(0xFF689F38),
     ),
     GameLevel(
@@ -1139,7 +1153,7 @@ class GameLevel {
       star1Score: 5450,
       star2Score: 9050,
       star3Score: 12100,
-      rawPool: [GameItem.butter, GameItem.cheese, GameItem.iceCreamCone, GameItem.milk, GameItem.croissantDough, GameItem.nuts, GameItem.rawBread],
+      rawPool: [GameItem.butter, GameItem.cheese, GameItem.iceCreamCone, GameItem.milk, GameItem.nuts, GameItem.rawBread],
       orderPool: [GameItem.kunefe, GameItem.baklava, GameItem.dondurmaliKunefe],
       initialBoardItems: [GameItem.butter, GameItem.cheese, GameItem.iceCreamCone, GameItem.nuts],
       themeColor: Color(0xFFAD1457),
@@ -1154,9 +1168,9 @@ class GameLevel {
       star1Score: 5500,
       star2Score: 9150,
       star3Score: 12200,
-      rawPool: [GameItem.milk, GameItem.rawRice, GameItem.butter, GameItem.cheese, GameItem.croissantDough, GameItem.nuts, GameItem.iceCreamCone, GameItem.rawBread],
+      rawPool: [GameItem.milk, GameItem.rawRice, GameItem.butter, GameItem.cheese, GameItem.nuts, GameItem.iceCreamCone, GameItem.rawBread],
       orderPool: [GameItem.ricePudding, GameItem.baklava, GameItem.dondurmaliKunefe],
-      initialBoardItems: [GameItem.milk, GameItem.rawRice, GameItem.butter, GameItem.croissantDough],
+      initialBoardItems: [GameItem.milk, GameItem.rawRice, GameItem.butter, GameItem.nuts],
       themeColor: Color(0xFF880E4F),
     ),
 

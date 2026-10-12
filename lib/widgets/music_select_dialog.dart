@@ -18,10 +18,11 @@ class _MusicSelectDialogState extends State<MusicSelectDialog> {
       child: Container(
         constraints: const BoxConstraints(maxWidth: 440),
         padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
             // Header
             Row(
               children: [
@@ -75,25 +76,31 @@ class _MusicSelectDialogState extends State<MusicSelectDialog> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Icon(
-                        SoundService.musicEnabled
-                            ? Icons.music_note_rounded
-                            : Icons.music_off_rounded,
-                        color: Colors.deepOrange,
-                        size: 22,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Arka Plan Müziği',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.brown.shade900,
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Icon(
+                          SoundService.musicEnabled
+                              ? Icons.music_note_rounded
+                              : Icons.music_off_rounded,
+                          color: Colors.deepOrange,
+                          size: 22,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            'Arka Plan Müziği',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.brown.shade900,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   Switch(
                     value: SoundService.musicEnabled,
@@ -185,14 +192,18 @@ class _MusicSelectDialogState extends State<MusicSelectDialog> {
                             children: [
                               Row(
                                 children: [
-                                  Text(
-                                    track.title,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                      color: isSelected
-                                          ? Colors.brown.shade900
-                                          : Colors.grey.shade800,
+                                  Flexible(
+                                    child: Text(
+                                      track.title,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                        color: isSelected
+                                            ? Colors.brown.shade900
+                                            : Colors.grey.shade800,
+                                      ),
                                     ),
                                   ),
                                   if (isSelected) ...[
@@ -272,6 +283,7 @@ class _MusicSelectDialogState extends State<MusicSelectDialog> {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 }

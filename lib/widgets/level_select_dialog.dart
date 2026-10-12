@@ -91,12 +91,16 @@ class LevelSelectDialog extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              Text(
-                                'Günlük Şans Çarkı',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.brown.shade900,
+                              Flexible(
+                                child: Text(
+                                  'Günlük Şans Çarkı',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.brown.shade900,
+                                  ),
                                 ),
                               ),
                               if (SaveService.canSpinDailyWheel()) ...[
@@ -242,7 +246,10 @@ class LevelSelectDialog extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 3),
-                                Row(
+                                Wrap(
+                                  spacing: 6,
+                                  runSpacing: 2,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
                                   children: [
                                     Text(
                                       '🎯 Hedef: ${level.targetScore} P',
@@ -252,7 +259,6 @@ class LevelSelectDialog extends StatelessWidget {
                                         color: level.themeColor,
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
                                     Text(
                                       '• ${level.categoryName}',
                                       style: TextStyle(

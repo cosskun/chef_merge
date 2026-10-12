@@ -33,6 +33,7 @@ class _CustomSkinDialogState extends State<CustomSkinDialog>
     final totalStars = controller.totalStarsEarned;
 
     return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       backgroundColor: const Color(0xFFFFFDF9),
       child: Container(
@@ -58,13 +59,16 @@ class _CustomSkinDialogState extends State<CustomSkinDialog>
                     children: [
                       Text(
                         'Şefin Yıldız Dükkanı & Temalar',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 16.5,
                           fontWeight: FontWeight.bold,
                           color: Colors.brown.shade900,
                         ),
                       ),
-                      Row(
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           const Text('⭐ Toplam Yıldızın: ', style: TextStyle(fontSize: 11.5, color: Colors.brown)),
                           Text(
@@ -95,9 +99,22 @@ class _CustomSkinDialogState extends State<CustomSkinDialog>
               unselectedLabelColor: Colors.brown.shade600,
               indicatorColor: const Color(0xFFFF7043),
               indicatorWeight: 3,
+              labelPadding: const EdgeInsets.symmetric(horizontal: 4),
               tabs: const [
-                Tab(icon: Icon(Icons.table_restaurant_rounded, size: 20), text: 'Mutfak Tezgâhları'),
-                Tab(icon: Icon(Icons.face_rounded, size: 20), text: 'Şef Maskotları'),
+                Tab(
+                  icon: Icon(Icons.table_restaurant_rounded, size: 18),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text('Mutfak Tezgâhları', style: TextStyle(fontSize: 12.5)),
+                  ),
+                ),
+                Tab(
+                  icon: Icon(Icons.face_rounded, size: 18),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text('Şef Maskotları', style: TextStyle(fontSize: 12.5)),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 12),
@@ -163,12 +180,16 @@ class _CustomSkinDialogState extends State<CustomSkinDialog>
                                   children: [
                                     Row(
                                       children: [
-                                        Text(
-                                          skin.name,
-                                          style: TextStyle(
-                                            fontSize: 13.5,
-                                            fontWeight: FontWeight.bold,
-                                            color: isUnlocked ? Colors.brown.shade900 : Colors.grey.shade600,
+                                        Flexible(
+                                          child: Text(
+                                            skin.name,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              fontSize: 13.5,
+                                              fontWeight: FontWeight.bold,
+                                              color: isUnlocked ? Colors.brown.shade900 : Colors.grey.shade600,
+                                            ),
                                           ),
                                         ),
                                         if (isSelected) ...[
@@ -273,12 +294,16 @@ class _CustomSkinDialogState extends State<CustomSkinDialog>
                                   children: [
                                     Row(
                                       children: [
-                                        Text(
-                                          chef.title,
-                                          style: TextStyle(
-                                            fontSize: 13.5,
-                                            fontWeight: FontWeight.bold,
-                                            color: isUnlocked ? Colors.brown.shade900 : Colors.grey.shade600,
+                                        Flexible(
+                                          child: Text(
+                                            chef.title,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              fontSize: 13.5,
+                                              fontWeight: FontWeight.bold,
+                                              color: isUnlocked ? Colors.brown.shade900 : Colors.grey.shade600,
+                                            ),
                                           ),
                                         ),
                                         if (isSelected) ...[

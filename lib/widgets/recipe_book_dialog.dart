@@ -147,15 +147,19 @@ class _RecipeBookDialogState extends State<RecipeBookDialog> {
                     children: [
                       Row(
                         children: [
-                          Text(
-                            'Şefin Tarif Rehberi',
+                          Flexible(
+                            child: Text(
+                              'Şefin Tarif Rehberi',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w900,
                               color: Colors.brown.shade900,
                             ),
                           ),
-                          const SizedBox(width: 6),
+                        ),
+                        const SizedBox(width: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
                             decoration: BoxDecoration(

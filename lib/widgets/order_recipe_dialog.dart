@@ -2,22 +2,63 @@ import 'package:flutter/material.dart';
 import '../models/order_model.dart';
 import '../models/recipe_model.dart';
 import '../models/item_model.dart';
-import '../services/localization_service.dart';
 
-class OrderRecipeDialog extends StatelessWidget {
+class OrderRecipeDialog extends StatefulWidget {
   final CustomerOrder order;
+  final int initialPageIndex;
 
-  const OrderRecipeDialog({super.key, required this.order});
+  const OrderRecipeDialog({
+    super.key,
+    required this.order,
+    this.initialPageIndex = 0,
+  });
+
+  @override
+  State<OrderRecipeDialog> createState() => _OrderRecipeDialogState();
+}
+
+class _OrderRecipeDialogState extends State<OrderRecipeDialog> {
+  late int _currentPage;
+  late final PageController _pageController;
+
+  bool get _isMultiItem => widget.order.isPartyTray && widget.order.partyItems.length > 1;
+  int get _totalPages => _isMultiItem ? widget.order.partyItems.length : 1;
+
+  GameItem get _currentItem {
+    if (_isMultiItem) {
+      final safeIndex = _currentPage.clamp(0, widget.order.partyItems.length - 1);
+      return widget.order.partyItems[safeIndex];
+    }
+    return widget.order.targetItem;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final maxIndex = _totalPages - 1;
+    _currentPage = widget.initialPageIndex.clamp(0, maxIndex);
+    _pageController = PageController(initialPage: _currentPage);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _goToPage(int page) {
+    if (page >= 0 && page < _totalPages) {
+      _pageController.animateToPage(
+        page,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final targetItem = order.targetItem;
-    final List<Recipe> steps = order.isPartyTray
-        ? order.partyItems
-            .expand((item) => Recipe.getStepsFor(item.code))
-            .toSet()
-            .toList()
-        : Recipe.getStepsFor(targetItem.code);
+    final currentItem = _currentItem;
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -33,20 +74,33 @@ class OrderRecipeDialog extends StatelessWidget {
             // 1. Top Header with Order Info (100% Overflow Protected)
             Row(
               children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: targetItem.accentColor.withValues(alpha: 0.4),
-                    shape: BoxShape.circle,
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: Container(
+                    key: ValueKey(currentItem.code),
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: currentItem.accentColor.withValues(alpha: 0.4),
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: currentItem.imageAsset != null && currentItem.imageAsset!.isNotEmpty
+                        ? Image.asset(
+                            currentItem.imageAsset!,
+                            width: 32,
+                            height: 32,
+                            fit: BoxFit.contain,
+                            errorBuilder: (c, e, s) => Text(
+                              currentItem.emoji,
+                              style: const TextStyle(fontSize: 26),
+                            ),
+                          )
+                        : Text(
+                            currentItem.emoji,
+                            style: const TextStyle(fontSize: 26),
+                          ),
                   ),
-                  alignment: Alignment.center,
-                  child: targetItem.imageAsset != null && targetItem.imageAsset!.isNotEmpty
-                      ? Image.asset(targetItem.imageAsset!, width: 32, height: 32, fit: BoxFit.contain, errorBuilder: (c, e, s) => Text(targetItem.emoji, style: const TextStyle(fontSize: 26)))
-                      : Text(
-                          targetItem.emoji,
-                          style: const TextStyle(fontSize: 26),
-                        ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -57,13 +111,13 @@ class OrderRecipeDialog extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            order.customerAvatar,
+                            widget.order.customerAvatar,
                             style: const TextStyle(fontSize: 13),
                           ),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
-                              "${order.customerName}'in Siparişi",
+                              "${widget.order.customerName}'in Siparişi",
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -76,15 +130,19 @@ class OrderRecipeDialog extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 2),
-                      Text(
-                        targetItem.localizedName,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.brown.shade900,
-                          height: 1.15,
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: Text(
+                          currentItem.localizedName,
+                          key: ValueKey(currentItem.code),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.brown.shade900,
+                            height: 1.15,
+                          ),
                         ),
                       ),
                     ],
@@ -99,9 +157,74 @@ class OrderRecipeDialog extends StatelessWidget {
               ],
             ),
 
-            const Divider(height: 20),
+            const Divider(height: 16),
 
-            // 2. Recipe Steps Title
+            // 2. Multi-Item Pagination Bar (Only visible when single order has multiple items)
+            if (_isMultiItem) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50.withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.orange.shade200),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      tooltip: 'Önceki Yemek',
+                      icon: const Icon(Icons.chevron_left_rounded, size: 22),
+                      color: _currentPage > 0 ? Colors.deepOrange : Colors.grey.shade400,
+                      onPressed: _currentPage > 0 ? () => _goToPage(_currentPage - 1) : null,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Yemek ${_currentPage + 1} / $_totalPages: ',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.brown.shade700,
+                            ),
+                          ),
+                          Flexible(
+                            child: Text(
+                              currentItem.localizedName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.deepOrange.shade800,
+                              ),
+                            ),
+                          ),
+                          if (widget.order.isPartyTray &&
+                              _currentPage < widget.order.partyCompletedItems.length &&
+                              widget.order.partyCompletedItems[_currentPage]) ...[
+                            const SizedBox(width: 4),
+                            const Icon(Icons.check_circle_rounded, color: Colors.green, size: 14),
+                          ],
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'Sonraki Yemek',
+                      icon: const Icon(Icons.chevron_right_rounded, size: 22),
+                      color: _currentPage < _totalPages - 1 ? Colors.deepOrange : Colors.grey.shade400,
+                      onPressed: _currentPage < _totalPages - 1 ? () => _goToPage(_currentPage + 1) : null,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+
+            // 3. Recipe Steps Title
             Row(
               children: [
                 const Icon(Icons.auto_awesome, size: 16, color: Colors.orange),
@@ -118,94 +241,113 @@ class OrderRecipeDialog extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
 
-            // 3. Scrollable Steps List (Fits any screen height without vertical overflow)
+            // 4. Scrollable / Paged Steps List
             Flexible(
-              child: steps.isEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      child: Text(
-                        'Bu ürün doğrudan kilerden çıkarılabilir!',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.brown.shade600, fontSize: 12),
+              child: PageView.builder(
+                controller: _pageController,
+                itemCount: _totalPages,
+                physics: _isMultiItem ? const BouncingScrollPhysics() : const NeverScrollableScrollPhysics(),
+                onPageChanged: (page) {
+                  setState(() {
+                    _currentPage = page;
+                  });
+                },
+                itemBuilder: (context, pageIdx) {
+                  final pageItem = _isMultiItem ? widget.order.partyItems[pageIdx] : widget.order.targetItem;
+                  final steps = Recipe.getStepsFor(pageItem.code);
+
+                  if (steps.isEmpty) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Text(
+                          'Bu ürün doğrudan kilerden çıkarılabilir!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.brown.shade600, fontSize: 12),
+                        ),
                       ),
-                    )
-                  : ListView.separated(
-                      shrinkWrap: true,
-                      itemCount: steps.length,
-                      separatorBuilder: (context, index) => const SizedBox(height: 8),
-                      itemBuilder: (context, index) {
-                        final stepIndex = index + 1;
-                        final recipe = steps[index];
-                        final itemA = GameItem.findByCode(recipe.itemACode) ?? GameItem.rawTomato;
-                        final itemB = GameItem.findByCode(recipe.itemBCode) ?? GameItem.rawTomato;
-                        final result = recipe.result;
+                    );
+                  }
 
-                        return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.orange.shade50.withValues(alpha: 0.6),
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: Colors.orange.shade100),
-                          ),
-                          child: Row(
-                            children: [
-                              // Step Number Badge
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: Colors.orange.shade600,
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Text(
-                                  '$stepIndex',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                  return ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: steps.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: 8),
+                    itemBuilder: (context, index) {
+                      final stepIndex = index + 1;
+                      final recipe = steps[index];
+                      final itemA = GameItem.findByCode(recipe.itemACode) ?? GameItem.rawTomato;
+                      final itemB = GameItem.findByCode(recipe.itemBCode) ?? GameItem.rawTomato;
+                      final result = recipe.result;
+
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.shade50.withValues(alpha: 0.6),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: Colors.orange.shade100),
+                        ),
+                        child: Row(
+                          children: [
+                            // Step Number Badge
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: Colors.orange.shade600,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                '$stepIndex',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const SizedBox(width: 6),
+                            ),
+                            const SizedBox(width: 6),
 
-                              // Item A
-                              _buildStepItem(itemA),
-                              const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 3),
-                                child: Text(
-                                  '+',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.brown,
-                                  ),
+                            // Item A
+                            _buildStepItem(itemA),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 3),
+                              child: Text(
+                                '+',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.brown,
                                 ),
                               ),
+                            ),
 
-                              // Item B
-                              _buildStepItem(itemB),
-                              const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 3),
-                                child: Icon(
-                                  Icons.arrow_forward_rounded,
-                                  color: Colors.orange,
-                                  size: 14,
-                                ),
+                            // Item B
+                            _buildStepItem(itemB),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 3),
+                              child: Icon(
+                                Icons.arrow_forward_rounded,
+                                color: Colors.orange,
+                                size: 14,
                               ),
+                            ),
 
-                              // Result Item
-                              Expanded(child: _buildStepResult(result)),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
+                            // Result Item
+                            Expanded(child: _buildStepResult(result)),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
             ),
 
             const SizedBox(height: 12),
 
-            // 4. Got it Button
+            // 5. Got it Button
             SizedBox(
               width: double.infinity,
               height: 44,

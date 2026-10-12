@@ -25,10 +25,14 @@ class LeaderboardDialog extends StatelessWidget {
     leaderboard.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
 
     return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       backgroundColor: const Color(0xFFFFFDF9),
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 420, maxHeight: 560),
+        constraints: BoxConstraints(
+          maxWidth: 420,
+          maxHeight: (MediaQuery.of(context).size.height * 0.85).clamp(360.0, 560.0),
+        ),
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
@@ -50,6 +54,8 @@ class LeaderboardDialog extends StatelessWidget {
                     children: [
                       Text(
                         'Oyuncu Sıralaması',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -58,6 +64,8 @@ class LeaderboardDialog extends StatelessWidget {
                       ),
                       Text(
                         'En usta şefler listesi ve rekorlar!',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 11.5,
                           color: Colors.brown.shade600,
@@ -148,6 +156,8 @@ class LeaderboardDialog extends StatelessWidget {
                             children: [
                               Text(
                                 item['name'] as String,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: isPlayer ? FontWeight.w900 : FontWeight.bold,

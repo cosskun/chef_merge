@@ -195,4 +195,28 @@ class SaveService {
   static Future<void> saveLanguage(String langCode) async {
     await _prefs?.setString(_keyLanguage, langCode);
   }
+
+  /// Clears all stored game progress, stars, scores, boosters, and cosmetic customizations.
+  /// If [keepSettings] is true, language and audio preferences are preserved.
+  static Future<void> resetAllData({bool keepSettings = true}) async {
+    await _prefs?.remove(_keyLastLevel);
+    await _prefs?.remove(_keyUnlockedLevels);
+    await _prefs?.remove(_keyLevelStars);
+    await _prefs?.remove(_keyHighScore);
+    await _prefs?.remove(_keyEndlessHighScore);
+    await _prefs?.remove(_keyBoardSkin);
+    await _prefs?.remove(_keyChefAvatar);
+    await _prefs?.remove(_keyFreezeBoosters);
+    await _prefs?.remove(_keySpatulaBoosters);
+    await _prefs?.remove(_keyBroomBoosters);
+    await _prefs?.remove(_keyDiscoveredSecretRecipes);
+    await _prefs?.remove(_keyLastDailySpinDate);
+
+    if (!keepSettings) {
+      await _prefs?.remove(_keyLanguage);
+      await _prefs?.remove(_keySoundEnabled);
+      await _prefs?.remove(_keyMusicEnabled);
+      await _prefs?.remove(_keyMusicTrack);
+    }
+  }
 }

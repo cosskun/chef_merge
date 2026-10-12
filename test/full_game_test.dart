@@ -199,5 +199,38 @@ void main() {
       }
     });
   });
+
+  group('5. Veri Sıfırlama (Data Reset) Testleri', () {
+    test('Veri sıfırlama çeviri anahtarları 4 dilde de mevcut olmalıdır', () {
+      for (final lang in ['tr', 'en', 'es', 'de']) {
+        LocalizationService.currentLanguage.value = lang;
+        expect(LocalizationService.tr('reset_data').isNotEmpty, true);
+        expect(LocalizationService.tr('reset_confirm_title').isNotEmpty, true);
+        expect(LocalizationService.tr('reset_confirm_message').isNotEmpty, true);
+        expect(LocalizationService.tr('confirm_reset').isNotEmpty, true);
+        expect(LocalizationService.tr('cancel').isNotEmpty, true);
+        expect(LocalizationService.tr('reset_success').isNotEmpty, true);
+      }
+    });
+
+    test('resetAllData() tüm oyun ilerlemesini ve istatistikleri sıfırlamalıdır', () async {
+      final controller = GameController.instance;
+      controller.setLevel(5);
+
+      await controller.resetAllData(keepSettings: true);
+
+      expect(controller.currentLevelIndex, 0);
+      expect(controller.unlockedLevels, {0});
+      expect(controller.levelStars.isEmpty, true);
+      expect(controller.totalStarsEarned, 0);
+      expect(controller.highScore, 0);
+      expect(controller.endlessHighScore, 0);
+      expect(controller.boardSkinId, 'classic');
+      expect(controller.chefAvatar, '👨‍🍳');
+      expect(controller.freezeBoosters, 3);
+      expect(controller.spatulaBoosters, 3);
+      expect(controller.broomBoosters, 3);
+    });
+  });
 }
 

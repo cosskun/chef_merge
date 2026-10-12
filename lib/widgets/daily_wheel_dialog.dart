@@ -206,9 +206,10 @@ class _DailyWheelDialogState extends State<DailyWheelDialog>
       child: Container(
         constraints: const BoxConstraints(maxWidth: 420),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
             // Header Title
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -409,14 +410,18 @@ class _DailyWheelDialogState extends State<DailyWheelDialog>
                       )
                     else ...[
                       Text(_canSpin ? '🎡 ' : '✨ ', style: const TextStyle(fontSize: 18)),
-                      Text(
-                        _canSpin
-                            ? 'ŞANS ÇARKINI ÇEVİR'
-                            : 'YARIN TEKRAR GEL (TAMAM)',
-                        style: const TextStyle(
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 0.5,
+                      Flexible(
+                        child: Text(
+                          _canSpin
+                              ? 'ŞANS ÇARKINI ÇEVİR'
+                              : 'YARIN TEKRAR GEL (TAMAM)',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                       ),
                     ],
@@ -427,7 +432,8 @@ class _DailyWheelDialogState extends State<DailyWheelDialog>
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 }
 

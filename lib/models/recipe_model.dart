@@ -163,9 +163,9 @@ class Recipe {
     ),
     Recipe(
       itemACode: 'spaghetti',
-      itemBCode: 'creamy_mushroom_soup',
+      itemBCode: 'raw_chicken',
       result: GameItem.alfredoPasta,
-      title: 'Kremalı Fettuccine Alfredo',
+      title: 'Kremalı Tavuklu Alfredo',
     ),
     Recipe(
       itemACode: 'bolognese_pasta',

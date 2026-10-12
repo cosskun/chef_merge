@@ -211,6 +211,12 @@ class GameController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Clears all game data through SaveService and resets controller state to initial defaults
+  Future<void> resetAllData({bool keepSettings = true}) async {
+    await SaveService.resetAllData(keepSettings: keepSettings);
+    loadSavedData();
+  }
+
   void _initLevelState(int levelIndex) {
     _isEndlessMode = false;
     _currentLevelIndex = levelIndex.clamp(0, GameLevel.allLevels.length - 1);
@@ -278,6 +284,13 @@ class GameController extends ChangeNotifier {
       _board[index] = item;
       notifyListeners();
     }
+  }
+
+  @visibleForTesting
+  void setOrdersForTesting(List<CustomerOrder> testOrders) {
+    _orders.clear();
+    _orders.addAll(testOrders);
+    notifyListeners();
   }
 
   void setBoardSkin(String skinId) {
@@ -578,7 +591,7 @@ class GameController extends ChangeNotifier {
     final randomItem = SpawnEngine.selectWeightedSpawnItem(
       orders: _orders,
       board: _board,
-      levelRawPool: currentLevel.rawPool,
+      levelRawPool: currentLevel.validRawPool,
       isEndlessMode: _isEndlessMode,
       fallbackOrderPool: currentLevel.orderPool,
       random: _random,
@@ -846,23 +859,23 @@ class GameController extends ChangeNotifier {
     final item = _board[fromBoardIndex];
     if (item == null) return false;
 
-    // 1. Tekli sipariş eşleşmesi
-    final matchingSingle = _orders.where((o) =>
-        !o.isCompleted && !o.isExpired && !o.isPartyTray && o.targetItem.code == item.code).toList();
-    if (matchingSingle.isNotEmpty) {
-      return deliverOrder(fromBoardIndex, matchingSingle.first.id);
-    }
+    // Yukarıdaki siparişleri soldan sağa sırayla kontrol et:
+    for (final order in _orders) {
+      if (order.isCompleted || order.isExpired) continue;
 
-    // 2. Parti tepsisi eşleşmesi
-    final matchingParty = _orders.where((o) {
-      if (o.isCompleted || o.isExpired || !o.isPartyTray) return false;
-      for (int i = 0; i < o.partyItems.length; i++) {
-        if (!o.partyCompletedItems[i] && o.partyItems[i].code == item.code) return true;
+      if (order.isPartyTray) {
+        // Parti tepsisinde henüz teslim edilmemiş eşleşen ürün var mı?
+        for (int i = 0; i < order.partyItems.length; i++) {
+          if (!order.partyCompletedItems[i] && order.partyItems[i].code == item.code) {
+            return deliverOrder(fromBoardIndex, order.id);
+          }
+        }
+      } else {
+        // Tekli veya VIP sipariş eşleşmesi
+        if (order.targetItem.code == item.code) {
+          return deliverOrder(fromBoardIndex, order.id);
+        }
       }
-      return false;
-    }).toList();
-    if (matchingParty.isNotEmpty) {
-      return deliverOrder(fromBoardIndex, matchingParty.first.id);
     }
 
     // Eşleşme bulunamadı -> Ceza uygula

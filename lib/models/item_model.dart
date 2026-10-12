@@ -230,13 +230,13 @@ class GameItem {
   static const GameItem alfredoPasta = GameItem(
     id: 'alfredo_pasta',
     code: 'alfredo_pasta',
-    name: 'Kremalı Fettuccine Alfredo',
+    name: 'Kremalı Tavuklu Alfredo',
     emoji: '🫕',
     level: 4,
     category: ItemCategory.meal,
     primaryColor: Color(0xFFFFB300),
     accentColor: Color(0xFFFFF8E1),
-    description: 'Mantar, süt kreması ve tereyağlı ipeksi Fettuccine Alfredo!',
+    description: 'Taze tavuk göğsü, krema ve spagettiyle ipeksi Tavuklu Alfredo!',
     imageAsset: 'assets/items/alfredo_pasta.png',
   );
 
@@ -653,13 +653,13 @@ class GameItem {
   static const GameItem rawBread = GameItem(
     id: 'raw_bread',
     code: 'raw_bread',
-    name: 'Ekmek Hamuru',
+    name: 'Hamur',
     emoji: '🌾',
     level: 1,
     category: ItemCategory.raw,
     primaryColor: Color(0xFFFFB74D),
     accentColor: Color(0xFFFFE0B2),
-    description: 'Taptaze mayalanmış fırın hamuru.',
+    description: 'Taptaze mayalanmış hamur.',
     imageAsset: 'assets/items/raw_bread.png',
   );
 

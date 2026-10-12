@@ -33,11 +33,12 @@ class _TutorialScreenState extends State<TutorialScreen> with SingleTickerProvid
             ),
           ],
         ),
-        child: const Row(
-          mainAxisSize: MainAxisSize.min,
+        child: const Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 8,
           children: [
             Text('🍅 🍞 🧀', style: TextStyle(fontSize: 18)),
-            SizedBox(width: 8),
             Text(
               'KİLERDEN MALZEME ÇIKAR 👆',
               style: TextStyle(
@@ -251,34 +252,42 @@ class _TutorialScreenState extends State<TutorialScreen> with SingleTickerProvid
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.orange.shade500,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            '🎓 ÖĞRETİCİ (${_currentStep + 1}/${_steps.length})',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 0.5,
+                        Flexible(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.orange.shade500,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              '🎓 ÖĞRETİCİ (${_currentStep + 1}/${_steps.length})',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.5,
+                              ),
                             ),
                           ),
                         ),
+                        const SizedBox(width: 8),
                         TextButton.icon(
                           style: TextButton.styleFrom(
                             foregroundColor: Colors.brown.shade800,
                             backgroundColor: Colors.white.withValues(alpha: 0.8),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          icon: const Icon(Icons.close_rounded, size: 16),
+                          icon: const Icon(Icons.close_rounded, size: 14),
                           label: const Text(
-                            'Öğreticiyi Geç',
-                            style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold),
+                            'Geç',
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
                           ),
                           onPressed: _finishTutorial,
                         ),
@@ -303,9 +312,10 @@ class _TutorialScreenState extends State<TutorialScreen> with SingleTickerProvid
                               ),
                             ],
                           ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
+                          child: SingleChildScrollView(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
                               // Step Icon & Title
                               Column(
                                 children: [
@@ -407,6 +417,7 @@ class _TutorialScreenState extends State<TutorialScreen> with SingleTickerProvid
                         ),
                       ),
                     ),
+                  ),
 
                     // 3. Step Dots Indicator
                     Row(

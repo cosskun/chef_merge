@@ -23,14 +23,17 @@ class OrderCard extends StatelessWidget {
     }
   }
 
-  void _showRecipe(BuildContext context) {
+  void _showRecipe(BuildContext context, {int initialPageIndex = 0}) {
     final wasPlaying = controller.isPlaying;
     if (wasPlaying) {
       controller.pauseGame();
     }
     showDialog(
       context: context,
-      builder: (context) => OrderRecipeDialog(order: order),
+      builder: (context) => OrderRecipeDialog(
+        order: order,
+        initialPageIndex: initialPageIndex,
+      ),
     ).then((_) {
       if (wasPlaying && !controller.hasTriggeredVictory) {
         controller.resumeGame();
@@ -129,20 +132,21 @@ class OrderCard extends StatelessWidget {
                   ),
                 ),
 
-                // 2. Middle Content (Dish Emoji & Name or Party Tray 3-Item Grid) - Tap to view recipe
+                // 2. Middle Content (Dish Emoji & Name or Party Tray Grid) - Tap to view recipe
                 Expanded(
-                  child: InkWell(
-                    onTap: () => _showRecipe(context),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
-                      child: order.isPartyTray
-                          ? Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: List.generate(order.partyItems.length, (idx) {
-                                final item = order.partyItems[idx];
-                                final isDone = order.partyCompletedItems[idx];
+                  child: order.isPartyTray
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: List.generate(order.partyItems.length, (idx) {
+                              final item = order.partyItems[idx];
+                              final isDone = order.partyCompletedItems[idx];
 
-                                return Expanded(
+                              return Expanded(
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(6),
+                                  onTap: () => _showRecipe(context, initialPageIndex: idx),
                                   child: Container(
                                     margin: const EdgeInsets.symmetric(horizontal: 1),
                                     padding: const EdgeInsets.symmetric(vertical: 2),
@@ -187,10 +191,16 @@ class OrderCard extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                );
-                              }),
-                            )
-                          : Column(
+                                ),
+                              );
+                            }),
+                          ),
+                        )
+                      : InkWell(
+                          onTap: () => _showRecipe(context),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+                            child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Flexible(
@@ -231,8 +241,8 @@ class OrderCard extends StatelessWidget {
                                 ),
                               ],
                             ),
-                    ),
-                  ),
+                          ),
+                        ),
                 ),
 
                 // 3. Bottom Row: Reward Badge & Tarif Button

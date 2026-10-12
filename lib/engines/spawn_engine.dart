@@ -47,7 +47,14 @@ abstract final class SpawnEngine {
       final neededPool = GameItem.rawPool.where((item) => neededCodes.contains(item.code)).toList();
       pool = neededPool.isNotEmpty ? neededPool : GameItem.rawPool;
     } else {
-      pool = levelRawPool;
+      // Bölüm modunda: Sadece bu bölümün siparişlerinde (veya tariflerinde) gerçekten gereken hammaddeler gelsin!
+      final levelNeededCodes = <String>{};
+      for (final order in fallbackOrderPool) {
+        final reqs = Recipe.getRawIngredientsRequirements(order.code);
+        levelNeededCodes.addAll(reqs.keys);
+      }
+      final validRawPool = levelRawPool.where((item) => levelNeededCodes.contains(item.code)).toList();
+      pool = validRawPool.isNotEmpty ? validRawPool : levelRawPool;
     }
 
     if (pool.isEmpty) {
