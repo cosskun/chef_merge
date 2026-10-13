@@ -227,19 +227,6 @@ class GameItem {
     imageAsset: 'assets/items/bolognese_pasta.png',
   );
 
-  static const GameItem alfredoPasta = GameItem(
-    id: 'alfredo_pasta',
-    code: 'alfredo_pasta',
-    name: 'Kremalı Tavuklu Alfredo',
-    emoji: '🫕',
-    level: 4,
-    category: ItemCategory.meal,
-    primaryColor: Color(0xFFFFB300),
-    accentColor: Color(0xFFFFF8E1),
-    description: 'Taze tavuk göğsü, krema ve spagettiyle ipeksi Tavuklu Alfredo!',
-    imageAsset: 'assets/items/alfredo_pasta.png',
-  );
-
   static const GameItem lasagna = GameItem(
     id: 'lasagna',
     code: 'lasagna',
@@ -1818,13 +1805,13 @@ class GameItem {
   static const GameItem cheeseBurger = GameItem(
     id: 'cheese_burger',
     code: 'cheese_burger',
-    name: 'Double Cheeseburger',
+    name: 'Cheeseburger',
     emoji: '🧀',
     level: 4,
     category: ItemCategory.meal,
     primaryColor: Color(0xFFE65100),
     accentColor: Color(0xFFFFD54F),
-    description: 'Eritilmiş çift kaşar peynirli ve sulu köfteli doyurucu cheeseburger!',
+    description: 'Eritilmiş nefis kaşar peynirli ve sulu köfteli doyurucu cheeseburger!',
     imageAsset: 'assets/items/cheese_burger.png',
   );
 
@@ -3090,7 +3077,6 @@ class GameItem {
     spaghetti,
     napoliPasta,
     bolognesePasta,
-    alfredoPasta,
     lasagna,
     sesame,
     simit,

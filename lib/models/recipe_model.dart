@@ -162,12 +162,6 @@ class Recipe {
       title: 'Bolonez Soslu Spagetti',
     ),
     Recipe(
-      itemACode: 'spaghetti',
-      itemBCode: 'raw_chicken',
-      result: GameItem.alfredoPasta,
-      title: 'Kremalı Tavuklu Alfredo',
-    ),
-    Recipe(
       itemACode: 'bolognese_pasta',
       itemBCode: 'cheese',
       result: GameItem.lasagna,
@@ -261,7 +255,7 @@ class Recipe {
       itemACode: 'burger',
       itemBCode: 'cheese',
       result: GameItem.cheeseBurger,
-      title: 'Double Cheeseburger',
+      title: 'Cheeseburger',
     ),
     Recipe(
       itemACode: 'potato',

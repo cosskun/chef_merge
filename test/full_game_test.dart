@@ -232,5 +232,36 @@ void main() {
       expect(controller.broomBoosters, 3);
     });
   });
+
+  group('6. Müfettiş Baskını Bildirim & Kesintisiz Oyun Testleri', () {
+    test('Müfettiş baskını tam ekranı bölmeden kayan popup (floating event) olarak çıkmalıdır', () {
+      final controller = GameController.instance;
+      controller.setLevel(0);
+      controller.resumeGame();
+
+      // Tezgâhta çöp yok
+      controller.triggerInspectorRaid();
+
+      // Tam ekran engelleyici overlay aktif olmamalıdır
+      expect(controller.isInspectorRaidActive, false);
+      expect(controller.floatingEvents.isNotEmpty, true);
+
+      final eventClean = controller.floatingEvents.last;
+      expect(eventClean.text.contains('MÜFETTİŞ BASKINI'), true);
+      expect(eventClean.text.contains('+300'), true);
+      expect(eventClean.durationMs, 2500);
+
+      // Tezgâha çöp koyup tekrar test edelim
+      controller.setItemAt(0, GameItem.ruinedFood);
+      controller.triggerInspectorRaid();
+
+      expect(controller.isInspectorRaidActive, false);
+      final eventDirty = controller.floatingEvents.last;
+      expect(eventDirty.text.contains('MÜFETTİŞ BASKINI'), true);
+      expect(eventDirty.text.contains('-150'), true);
+      expect(eventDirty.durationMs, 2500);
+    });
+  });
 }
+
 

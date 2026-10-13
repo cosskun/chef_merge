@@ -66,7 +66,7 @@ class _RecipeBookDialogState extends State<RecipeBookDialog> {
       case 'toast':
         return code.contains('toast') || code.contains('bread') || code.contains('sandwich');
       case 'pasta':
-        return code.contains('pasta') || code.contains('spaghetti') || code.contains('lasagna') || code.contains('alfredo') || code.contains('bolognese');
+        return code.contains('pasta') || code.contains('spaghetti') || code.contains('lasagna') || code.contains('bolognese');
       case 'bakery':
         return code.contains('simit') || code.contains('lahmacun') || code.contains('pide') || code.contains('baklava') || code.contains('sesame');
       case 'burger':

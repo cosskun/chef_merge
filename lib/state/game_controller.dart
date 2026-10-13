@@ -20,6 +20,7 @@ class FloatingEvent {
   final Color color;
   final IconData? icon;
   final Offset position;
+  final int durationMs;
 
   FloatingEvent({
     required this.id,
@@ -27,6 +28,7 @@ class FloatingEvent {
     required this.color,
     this.icon,
     required this.position,
+    this.durationMs = 1400,
   });
 }
 
@@ -943,10 +945,11 @@ class GameController extends ChangeNotifier {
       SoundService.playFastDelivery();
 
       _addFloatingEvent(
-        text: '🕵️‍♂️ TEFTİŞ BAŞARILI! +300 PUAN ⭐',
-        color: Colors.amber.shade900,
+        text: '🕵️‍♂️ MÜFETTİŞ BASKINI: MUTFAK PIRIL PIRIL!\n🌟 +300 P Temiz Mutfak Bonusu!',
+        color: Colors.green.shade800,
         icon: Icons.verified_user_rounded,
-        position: const Offset(160, 200),
+        position: const Offset(180, 160),
+        durationMs: 2500,
       );
 
       _updateHighScore();
@@ -958,20 +961,16 @@ class GameController extends ChangeNotifier {
       SoundService.playTimeout();
 
       _addFloatingEvent(
-        text: '🕵️‍♂️ -150 ÇÖP CEZASI! (Mutfak Kirli)',
-        color: Colors.red,
+        text: '🕵️‍♂️ MÜFETTİŞ BASKINI: TEZGÂHTA $ruinedCount ÇÖP VAR!\n⚠️ -150 P Hijyen Cezası & Seri Sıfırlandı!',
+        color: Colors.red.shade800,
         icon: Icons.gavel_rounded,
-        position: const Offset(160, 200),
+        position: const Offset(180, 160),
+        durationMs: 2500,
       );
     }
 
-    _isInspectorRaidActive = true;
+    _isInspectorRaidActive = false;
     notifyListeners();
-
-    Timer(const Duration(milliseconds: 4000), () {
-      _isInspectorRaidActive = false;
-      notifyListeners();
-    });
   }
 
   void _updateHighScore() {
@@ -1035,6 +1034,7 @@ class GameController extends ChangeNotifier {
     required Color color,
     IconData? icon,
     required Offset position,
+    int durationMs = 1400,
   }) {
     final event = FloatingEvent(
       id: 'event_${DateTime.now().microsecondsSinceEpoch}',
@@ -1042,10 +1042,11 @@ class GameController extends ChangeNotifier {
       color: color,
       icon: icon,
       position: position,
+      durationMs: durationMs,
     );
     _floatingEvents.add(event);
 
-    Timer(const Duration(milliseconds: 1400), () {
+    Timer(Duration(milliseconds: durationMs), () {
       _floatingEvents.removeWhere((e) => e.id == event.id);
       notifyListeners();
     });

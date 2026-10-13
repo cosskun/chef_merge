@@ -477,11 +477,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
               // 4. Floating Text & Particles Overlay
               FloatingOverlay(events: _controller.floatingEvents),
 
-              // 5. 🕵️‍♂️ Gurme Müfettiş Baskını Bildirim Katmanı
-              if (_controller.isInspectorRaidActive)
-                _buildInspectorRaidOverlay(),
-
-              // 6. 🧪 Gizli Simya Tarifi Keşfi Kutlama Katmanı
+              // 5. 🧪 Gizli Simya Tarifi Keşfi Kutlama Katmanı
               if (_controller.lastDiscoveredRecipe != null)
                 _buildSecretDiscoveryOverlay(_controller.lastDiscoveredRecipe!),
             ],
@@ -1192,109 +1188,6 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildInspectorRaidOverlay() {
-    final passed = _controller.inspectorCleanPassed ?? false;
-    final msg = _controller.inspectorRaidMessage ?? '';
-
-    return Positioned.fill(
-      child: Material(
-        color: Colors.black.withValues(alpha: 0.55),
-        child: Center(
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 24),
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: passed
-                    ? [const Color(0xFF1B5E20), const Color(0xFF2E7D32), const Color(0xFF388E3C)]
-                    : [const Color(0xFF880E4F), const Color(0xFFB71C1C), const Color(0xFFC62828)],
-              ),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: passed ? Colors.greenAccent : Colors.amberAccent,
-                width: 2.5,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: (passed ? Colors.greenAccent : Colors.redAccent).withValues(alpha: 0.5),
-                  blurRadius: 24,
-                  spreadRadius: 3,
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      passed ? '🕵️‍♂️✨' : '🕵️‍♂️⚠️',
-                      style: const TextStyle(fontSize: 32),
-                    ),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        'GURME MÜFETTİŞ BASKINI!',
-                        style: TextStyle(
-                          color: passed ? Colors.greenAccent : Colors.yellowAccent,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1.0,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.25),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Text(
-                    msg,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      height: 1.35,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: passed ? Colors.greenAccent : Colors.amberAccent,
-                      foregroundColor: Colors.brown.shade900,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    onPressed: () {
-                      _controller.dismissInspectorRaid();
-                    },
-                    child: Text(
-                      passed ? 'DEVAM ET ⭐' : 'DİKKAT EDECEĞİM ⚠️',
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildSecretDiscoveryOverlay(Recipe recipe) {
     final resultItem = recipe.result;
