@@ -200,6 +200,7 @@ class _DailyWheelDialogState extends State<DailyWheelDialog>
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       backgroundColor: const Color(0xFFFFFDF9),
       elevation: 16,
@@ -484,7 +485,7 @@ class _WheelPainter extends CustomPainter {
       final pY = center.dy + (radius - 6) * sin(startAngle);
       canvas.drawLine(center, Offset(pX, pY), dividerPaint);
 
-      // Draw Emoji & Text inside slice
+      // Draw Emoji & Text inside slice (Dikey / Radyal Çarkıfelek Düzeni)
       canvas.save();
       final textAngle = startAngle + sliceAngle / 2;
       canvas.translate(center.dx, center.dy);
@@ -493,17 +494,19 @@ class _WheelPainter extends CustomPainter {
       final textSpan = TextSpan(
         children: [
           TextSpan(
-            text: '${reward.emoji}\n',
-            style: const TextStyle(fontSize: 18),
+            text: '${reward.emoji} ',
+            style: const TextStyle(fontSize: 15),
           ),
           TextSpan(
             text: reward.title,
             style: const TextStyle(
-              fontSize: 8.5,
+              fontSize: 10,
               fontWeight: FontWeight.w900,
               color: Colors.white,
+              letterSpacing: 0.2,
               shadows: [
-                Shadow(color: Colors.black45, blurRadius: 3, offset: Offset(0, 1)),
+                Shadow(color: Colors.black87, blurRadius: 4, offset: Offset(0, 1)),
+                Shadow(color: Colors.black45, blurRadius: 2, offset: Offset(0, -1)),
               ],
             ),
           ),
@@ -512,17 +515,18 @@ class _WheelPainter extends CustomPainter {
 
       final textPainter = TextPainter(
         text: textSpan,
-        textAlign: TextAlign.center,
+        textAlign: TextAlign.start,
         textDirection: TextDirection.ltr,
       );
-      textPainter.layout(maxWidth: 80);
+      textPainter.layout();
 
-      // Offset outward
-      canvas.translate(radius * 0.58, 0);
-      canvas.rotate(pi / 2); // Orient text upright relative to slice
+      // Dikey (radyal) doğrultuda dış çemberden merkeze doğru tek satırda hizala
+      canvas.translate(radius - 14, 0);
+      canvas.rotate(pi); // Dıştan merkeze doğru düzgün okuma yönü
+
       textPainter.paint(
         canvas,
-        Offset(-textPainter.width / 2, -textPainter.height / 2),
+        Offset(0, -textPainter.height / 2),
       );
 
       canvas.restore();

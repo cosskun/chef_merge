@@ -438,6 +438,24 @@ class GameController extends ChangeNotifier {
   }
 
   // =================== OYUN DÖNGÜSÜ & ZAMANLAYICI ===================
+  bool _wasPlayingBeforeBackground = false;
+
+  void handleAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.inactive) {
+      if (_isPlaying) {
+        _wasPlayingBeforeBackground = true;
+        pauseGame();
+      }
+    } else if (state == AppLifecycleState.resumed) {
+      if (_wasPlayingBeforeBackground) {
+        _wasPlayingBeforeBackground = false;
+        resumeGame();
+      }
+    }
+  }
+
   void resumeGame() {
     _isPlaying = true;
     SoundService.resumeBgm();

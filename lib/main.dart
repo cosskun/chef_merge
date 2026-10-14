@@ -24,8 +24,33 @@ Future<void> main() async {
   runApp(const ChefMergeApp());
 }
 
-class ChefMergeApp extends StatelessWidget {
-  const ChefMergeApp({super.key});
+class ChefMergeApp extends StatefulWidget {
+  final Widget? home;
+  const ChefMergeApp({super.key, this.home});
+
+  @override
+  State<ChefMergeApp> createState() => _ChefMergeAppState();
+}
+
+class _ChefMergeAppState extends State<ChefMergeApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    SoundService.handleAppLifecycleState(state);
+    GameController.instance.handleAppLifecycleState(state);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +70,7 @@ class ChefMergeApp extends StatelessWidget {
             ),
             fontFamily: 'Segoe UI',
           ),
-          home: const SplashScreen(),
+          home: widget.home ?? const SplashScreen(),
         );
       },
     );

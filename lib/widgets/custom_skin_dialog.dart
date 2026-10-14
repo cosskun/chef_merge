@@ -57,29 +57,40 @@ class _CustomSkinDialogState extends State<CustomSkinDialog>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Şefin Yıldız Dükkanı & Temalar',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 16.5,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.brown.shade900,
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Şefin Yıldız Dükkanı & Temalar',
+                          style: TextStyle(
+                            fontSize: 16.5,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.brown.shade900,
+                          ),
                         ),
                       ),
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          const Text('⭐ Toplam Yıldızın: ', style: TextStyle(fontSize: 11.5, color: Colors.brown)),
-                          Text(
-                            '$totalStars Yıldız',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w900,
-                              color: Color(0xFFFF8F00),
-                            ),
+                      const SizedBox(height: 2),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text.rich(
+                          TextSpan(
+                            children: [
+                              const TextSpan(
+                                text: '⭐ Toplam Yıldızın: ',
+                                style: TextStyle(fontSize: 11.5, color: Colors.brown),
+                              ),
+                              TextSpan(
+                                text: '$totalStars Yıldız',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w900,
+                                  color: Color(0xFFFF8F00),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ],
                   ),
@@ -180,7 +191,7 @@ class _CustomSkinDialogState extends State<CustomSkinDialog>
                                   children: [
                                     Row(
                                       children: [
-                                        Flexible(
+                                        Expanded(
                                           child: Text(
                                             skin.name,
                                             maxLines: 1,
@@ -210,6 +221,8 @@ class _CustomSkinDialogState extends State<CustomSkinDialog>
                                     ),
                                     Text(
                                       skin.description,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(fontSize: 10.5, color: Colors.brown.shade600),
                                     ),
                                   ],
@@ -294,7 +307,7 @@ class _CustomSkinDialogState extends State<CustomSkinDialog>
                                   children: [
                                     Row(
                                       children: [
-                                        Flexible(
+                                        Expanded(
                                           child: Text(
                                             chef.title,
                                             maxLines: 1,
@@ -324,6 +337,8 @@ class _CustomSkinDialogState extends State<CustomSkinDialog>
                                     ),
                                     Text(
                                       chef.description,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(fontSize: 10.5, color: Colors.brown.shade600),
                                     ),
                                   ],

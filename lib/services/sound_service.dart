@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 import 'save_service.dart';
@@ -58,6 +59,33 @@ class SoundService {
   static double _currentPlaybackRate = 1.0;
   static bool _isPlayingBgm = false;
   static bool get isPlayingBgm => _isPlayingBgm;
+  static bool _wasPlayingBeforeBackground = false;
+  static bool get wasPlayingBeforeBackground => _wasPlayingBeforeBackground;
+  static bool _isObserverRegistered = false;
+
+  @visibleForTesting
+  static set isPlayingBgmForTesting(bool value) => _isPlayingBgm = value;
+
+  /// Uygulama arkaplana alındığında veya tekrar açıldığında çağrılır.
+  /// Müzik ve seslerin sadece uygulama içerisindeyken (ön plandayken) çalmasını sağlar.
+  static void handleAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.inactive) {
+      if (_isPlayingBgm) {
+        _wasPlayingBeforeBackground = true;
+        pauseBgm();
+      }
+      try {
+        _sfxPlayer?.stop();
+      } catch (_) {}
+    } else if (state == AppLifecycleState.resumed) {
+      if (_wasPlayingBeforeBackground && musicEnabled) {
+        _wasPlayingBeforeBackground = false;
+        resumeBgm();
+      }
+    }
+  }
 
   static Future<Uint8List?> _loadSoundBytes(String assetPath) async {
     if (_soundBytesCache.containsKey(assetPath)) {
@@ -78,6 +106,13 @@ class SoundService {
     selectedTrackIndex = SaveService.getSelectedMusicTrack().clamp(0, tracks.length - 1);
     soundEnabled = SaveService.getSoundEnabled();
     musicEnabled = SaveService.getMusicEnabled();
+
+    if (!_isObserverRegistered) {
+      try {
+        WidgetsBinding.instance.addObserver(const _SoundLifecycleObserver());
+        _isObserverRegistered = true;
+      } catch (_) {}
+    }
 
     try {
       AudioPlayer.global.setAudioContext(
@@ -100,15 +135,17 @@ class SoundService {
       );
     } catch (_) {}
 
-    if (_bgmPlayer == null) {
-      _bgmPlayer = AudioPlayer(playerId: 'chef_merge_bgm');
-      _bgmPlayer?.setReleaseMode(ReleaseMode.loop);
-      _bgmPlayer?.setVolume(0.55);
-    }
-    if (_sfxPlayer == null) {
-      _sfxPlayer = AudioPlayer(playerId: 'chef_merge_sfx');
-      _sfxPlayer?.setPlayerMode(PlayerMode.lowLatency);
-    }
+    try {
+      if (_bgmPlayer == null) {
+        _bgmPlayer = AudioPlayer(playerId: 'chef_merge_bgm');
+        _bgmPlayer?.setReleaseMode(ReleaseMode.loop);
+        _bgmPlayer?.setVolume(0.55);
+      }
+      if (_sfxPlayer == null) {
+        _sfxPlayer = AudioPlayer(playerId: 'chef_merge_sfx');
+        _sfxPlayer?.setPlayerMode(PlayerMode.lowLatency);
+      }
+    } catch (_) {}
 
     // Preload SFX and BGM bytes in background so Web never issues direct media URLs
     for (final sfx in [
@@ -129,6 +166,7 @@ class SoundService {
     if (!musicEnabled) return;
     init();
     if (_isPlayingBgm && !forceRestart) return;
+    _isPlayingBgm = true;
 
     try {
       final track = currentTrack;
@@ -142,32 +180,39 @@ class SoundService {
       } else {
         await _bgmPlayer?.play(AssetSource(track.assetPath));
       }
-      _isPlayingBgm = true;
     } catch (_) {
       // Audio fallback
     }
   }
 
   static Future<void> stopBgm() async {
+    _isPlayingBgm = false;
     try {
       await _bgmPlayer?.stop();
-      _isPlayingBgm = false;
     } catch (_) {}
   }
 
   static Future<void> pauseBgm() async {
+    _isPlayingBgm = false;
     try {
       await _bgmPlayer?.pause();
-      _isPlayingBgm = false;
     } catch (_) {}
   }
 
   static Future<void> resumeBgm() async {
     if (!musicEnabled) return;
+    if (_isPlayingBgm) return;
+    _isPlayingBgm = true;
+    if (_bgmPlayer == null) return;
     try {
-      await _bgmPlayer?.resume();
-      _isPlayingBgm = true;
-    } catch (_) {}
+      if (_bgmPlayer!.state == PlayerState.paused) {
+        await _bgmPlayer?.resume();
+      } else {
+        await playBgm(forceRestart: true);
+      }
+    } catch (_) {
+      // Audio fallback
+    }
   }
 
   static Future<void> selectTrack(int index) async {
@@ -321,5 +366,14 @@ class SoundService {
       SystemSound.play(SystemSoundType.click);
     } catch (_) {}
     _playSfx('sfx_trash.wav');
+  }
+}
+
+class _SoundLifecycleObserver with WidgetsBindingObserver {
+  const _SoundLifecycleObserver();
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    SoundService.handleAppLifecycleState(state);
   }
 }

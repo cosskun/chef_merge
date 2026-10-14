@@ -15,6 +15,7 @@ class LevelVictoryDialog extends StatelessWidget {
     final hasNext = isPassed && (controller.currentLevelIndex + 1 < GameLevel.allLevels.length);
 
     return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       backgroundColor: const Color(0xFFFFFDF9),
       child: Container(

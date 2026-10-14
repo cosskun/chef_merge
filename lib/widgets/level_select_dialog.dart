@@ -12,11 +12,12 @@ class LevelSelectDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       backgroundColor: const Color(0xFFFFFDF9),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 440, maxHeight: 580),
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             // Header
@@ -91,7 +92,7 @@ class LevelSelectDialog extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              Flexible(
+                              Expanded(
                                 child: Text(
                                   'Günlük Şans Çarkı',
                                   maxLines: 1,
@@ -246,27 +247,30 @@ class LevelSelectDialog extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 3),
-                                Wrap(
-                                  spacing: 6,
-                                  runSpacing: 2,
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-                                    Text(
-                                      '🎯 Hedef: ${level.targetScore} P',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w700,
-                                        color: level.themeColor,
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        '🎯 Hedef: ${level.targetScore} P',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w700,
+                                          color: level.themeColor,
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      '• ${level.categoryName}',
-                                      style: TextStyle(
-                                        fontSize: 9.5,
-                                        color: Colors.grey.shade600,
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        '• ${level.categoryName}',
+                                        style: TextStyle(
+                                          fontSize: 9.5,
+                                          color: Colors.grey.shade600,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
